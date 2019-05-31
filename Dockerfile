@@ -6,5 +6,5 @@ WORKDIR /myapp
 ADD app app
 ADD requirements.txt .
 RUN pip install -r requirements.txt
-CMD python app/main.py
+CMD ["python", "app/main.py"]
 EXPOSE 5000
