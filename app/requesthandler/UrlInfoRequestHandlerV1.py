@@ -4,6 +4,7 @@ from response.ResponseFactory import ResponseFactory
 from responseconverter.ResponseConverterFactory import ResponseConverterFactory
 from errors.StoreError import StoreError
 import logging
+from flask import Response
 
 """
 Version 1 of class that handles url information requests.
@@ -32,9 +33,13 @@ class UrlInfoRequestHandlerV1(RequestHandler):
             isUrlSafe = self._urlStore.isSafe(urlToQuery)
         except StoreError:
             logging.warning("Could not fetch information about requested url: %s" % urlToQuery)
-            return "Internal error when handling url information request, url:" % urlToQuery, 500
+            return Response(response="Internal error when handling url information request, url:" % urlToQuery,
+                            status=500,
+                            mimetype='text/plain')
         else:
             result = ResultFactory.createUrlInfoResultV1(isUrlSafe)
             response = ResponseFactory.createResponseV1(result)
             responseGenerator = ResponseConverterFactory.createPrettyJsonConverter()
-            return responseGenerator.convertSerializedResponse(response)
+            return Response(response=responseGenerator.convertSerializedResponse(response),
+                            status=200,
+                            mimetype='application/json')

@@ -1,6 +1,7 @@
 import logging
 from errors.StoreError import StoreError
 from errors.JSONBadRequest import JSONBadRequest
+from flask import Response
 
 """
 Class intended to be an interface for url blacklist RequestHandlers
@@ -21,22 +22,30 @@ class UrlBlacklistRequestHandlerV1:
             urlToBlacklistJson = request.get_json(force=True)
         except JSONBadRequest:
             logging.warning("payload is not parse-able as json")
-            return "Payload needs to be json and contain url key intended to be blacklisted", 400
+            return Response(response="Payload needs to be json and contain url key intended to be blacklisted",
+                            status=400,
+                            mimetype='text/plain')
 
         if 'url' not in urlToBlacklistJson:
             logging.warning("payload json does not contain url key, json payload: %s" % urlToBlacklistJson)
-            return "Payload needs to be json and contain url key intended to be blacklisted", 400
+            return Response(response="Payload needs to be json and contain url key intended to be blacklisted",
+                            status=400,
+                            mimetype='text/plain')
 
         urlToBlacklist = urlToBlacklistJson['url']
 
         if urlToBlacklist == "":
-            return "Payload needs to contain the url intended to be blacklisted", 400
+            return Response(response="Payload needs to contain the url intended to be blacklisted",
+                            status=400,
+                            mimetype='text/plain')
 
         logging.info("Request received to blacklist url: %s" % urlToBlacklist)
 
         try:
             self._urlStore.addUrlToBlacklist(urlToBlacklist)
         except StoreError:
-            return "Internal error when handling url to be blacklisted, url: %s" % urlToBlacklist, 500
+            return Response(response="Internal error when handling url to be blacklisted, url: %s" % urlToBlacklist,
+                            status=500,
+                            mimetype='text/plain')
         else:
-            return ""
+            return Response(response="", status=200, mimetype='text/plain')

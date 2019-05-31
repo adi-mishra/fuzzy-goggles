@@ -16,8 +16,8 @@ class TestUrlInfoRequestHandler(unittest.TestCase):
         self.mockRequest.url = "http://something.com:8080/urlinfo/1/some/url"
         response = self.urlRequestHandlerV1.handleRequest(self.mockRequest)
         self.mockUrlInfoStore.isSafe.assert_called_once_with("some/url")
-        responseObj = json.loads(response)
+        responseJson = response.get_json()
 
-        assert responseObj["version"] == "1.0"
-        assert responseObj["result"]["version"] == "1.0"
-        assert responseObj["result"]["is_safe"] is False
+        assert responseJson["version"] == "1.0"
+        assert responseJson["result"]["version"] == "1.0"
+        assert responseJson["result"]["is_safe"] is False
