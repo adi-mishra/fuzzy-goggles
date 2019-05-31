@@ -35,7 +35,7 @@ Currently there are two endpoints supported by the app.
 
 >The reason for two versions in the response is so that the information encapsulated in the result can change independent of the outer overall response structure. For example, outer response structure can contain a block for response-context attributes which can convey additonal information to the user, in this case only the outer verison will have to be updated without affecting the meaning conveyed by the version of result block.
 
-2) Add a url to be blacklisted. A request can be sent to the endpoint 'blacklist/1' with a payload containing the url that needs to be blacklisted. For example, to blacklist the url 'abc.com:99/x?y=z', a POST request will be sent to "http://blacklist/1" with a payload containing `{"url":"abc.com:99/x?y=z"}`. Appropriate http codes will be returned in response.
+2) Add a url to be blacklisted. A request can be sent to the endpoint 'blacklist/1' with a payload containing the url that needs to be blacklisted. For example, to blacklist the url 'abc.com:99/x?y=z', a POST request will be sent to "http://localhost/blacklist/1" with a payload containing `{"url":"abc.com:99/x?y=z"}`. Appropriate http codes will be returned in response.
 
 # Running tests
 
