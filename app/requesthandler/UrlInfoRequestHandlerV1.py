@@ -29,6 +29,11 @@ class UrlInfoRequestHandlerV1(RequestHandler):
 
         logging.info("Request received for information about url: %s" % urlToQuery)
 
+        if urlToQuery == "":
+            return Response(response="Request did not contain a url to query for information",
+                            status=400,
+                            mimetype='text/plain')
+
         try:
             isUrlSafe = self._urlStore.isSafe(urlToQuery)
         except StoreError:

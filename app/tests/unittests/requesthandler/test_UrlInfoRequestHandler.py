@@ -12,6 +12,12 @@ class TestUrlInfoRequestHandler(unittest.TestCase):
         self.urlRequestHandlerV1 = UrlInfoRequestHandlerV1(self.mockUrlInfoStore)
 
     def test_getInfoResponseBody_returns_expectedJsonStructure(self):
+        self.mockRequest.url = "http://something.com:8080/urlinfo/1/"
+        response = self.urlRequestHandlerV1.handleRequest(self.mockRequest)
+        self.mockUrlInfoStore.isSafe.assert_not_called
+        assert response.status_code is 400
+
+    def test_getInfoResponseBody_returns_expectedJsonStructure(self):
         self.mockUrlInfoStore.isSafe.return_value = False
         self.mockRequest.url = "http://something.com:8080/urlinfo/1/some/url"
         response = self.urlRequestHandlerV1.handleRequest(self.mockRequest)
