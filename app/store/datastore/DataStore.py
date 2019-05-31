@@ -13,3 +13,11 @@ class DataStore:
     def hasItem(self, dataIdentifier):
         logging.error("getItem method of DataStore class has not implemented")
         raise NotImplementedError("Unimplemeted method")
+
+    """
+    Add item data to datastore.
+    """
+
+    def addItem(self, itemData):
+        logging.error("addItem method of DataStore class has not implemented")
+        raise NotImplementedError("Unimplemeted method")

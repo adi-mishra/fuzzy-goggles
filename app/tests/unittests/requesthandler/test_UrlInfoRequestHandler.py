@@ -8,20 +8,16 @@ class TestUrlInfoRequestHandler(unittest.TestCase):
 
     def setUp(self):
         self.mockUrlInfoStore = Mock()
+        self.mockRequest = Mock()
         self.urlRequestHandlerV1 = UrlInfoRequestHandlerV1(self.mockUrlInfoStore)
 
     def test_getInfoResponseBody_returns_expectedJsonStructure(self):
         self.mockUrlInfoStore.isSafe.return_value = False
-        response = self.urlRequestHandlerV1.getSerializedResponse("some/url")
+        self.mockRequest.url = "http://something.com:8080/urlinfo/1/some/url"
+        response = self.urlRequestHandlerV1.handleRequest(self.mockRequest)
         self.mockUrlInfoStore.isSafe.assert_called_once_with("some/url")
         responseObj = json.loads(response)
 
         assert responseObj["version"] == "1.0"
         assert responseObj["result"]["version"] == "1.0"
-        assert responseObj["result"]["is_safe"] == False
-
-    def test_getInfoResponseBody_returns_NoneIfStoreReturnsNone(self):
-        self.mockUrlInfoStore.isSafe.return_value = None
-        response = self.urlRequestHandlerV1.getSerializedResponse("some/url")
-        self.mockUrlInfoStore.isSafe.assert_called_once_with("some/url")
-        assert response is None
+        assert responseObj["result"]["is_safe"] is False

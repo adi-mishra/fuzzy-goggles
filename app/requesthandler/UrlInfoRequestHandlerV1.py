@@ -1,7 +1,8 @@
-from .UrlInfoRequestHandler import UrlInfoRequestHandler
+from .RequestHandler import RequestHandler
 from result.ResultFactory import ResultFactory
 from response.ResponseFactory import ResponseFactory
 from responseconverter.ResponseConverterFactory import ResponseConverterFactory
+from errors.StoreError import StoreError
 import logging
 
 """
@@ -9,23 +10,31 @@ Version 1 of class that handles url information requests.
 """
 
 
-class UrlInfoRequestHandlerV1(UrlInfoRequestHandler):
-    def __init__(self, urlInfoStore):
-        self._urlInfoStore = urlInfoStore
+class UrlInfoRequestHandlerV1(RequestHandler):
+    def __init__(self, urlStore):
+        self._urlStore = urlStore
 
     """
-    Get information about supplied url.
-    Returns valid json response body to be sent back to the user or None in case of error.
+    Get information about supplied url as part of request.
+    Returns valid response to be sent back to the user.
     """
 
-    def getSerializedResponse(self, url):
-        isUrlSafe = self._urlInfoStore.isSafe(url)
-        if isUrlSafe == None:
-            logging.warning("Could not fetch information about requested url: %s" % url)
-            return None
+    def handleRequest(self, request):
+        entireUrl = request.url
+        pathPrefix = "/urlinfo/1/"
 
-        result = ResultFactory.createUrlInfoResultV1(isUrlSafe)
+        indexOfExpectedUrlToQuery = entireUrl.find(pathPrefix)
+        urlToQuery = entireUrl[indexOfExpectedUrlToQuery + len(pathPrefix):]
 
-        response = ResponseFactory.createResponseV1(result)
-        responseGenerator = ResponseConverterFactory.createPrettyJsonConverter()
-        return responseGenerator.convertSerializedResponse(response)
+        logging.info("Request received for information about url: %s" % urlToQuery)
+
+        try:
+            isUrlSafe = self._urlStore.isSafe(urlToQuery)
+        except StoreError:
+            logging.warning("Could not fetch information about requested url: %s" % urlToQuery)
+            return "Internal error when handling url information request, url:" % urlToQuery, 500
+        else:
+            result = ResultFactory.createUrlInfoResultV1(isUrlSafe)
+            response = ResponseFactory.createResponseV1(result)
+            responseGenerator = ResponseConverterFactory.createPrettyJsonConverter()
+            return responseGenerator.convertSerializedResponse(response)

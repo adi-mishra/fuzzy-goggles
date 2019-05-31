@@ -1,5 +1,6 @@
-from flask import Flask, request
+from flask import Flask, request, Request
 from requesthandler.RequestHandlerFactory import RequestHandlerFactory
+from errors.JSONBadRequest import JSONBadRequest
 import logging
 import sys
 
@@ -10,22 +11,24 @@ logging.basicConfig(stream=sys.stderr, format='%(asctime)s - %(process)d - %(mes
 requestHandlerFactory = RequestHandlerFactory()
 
 
+def on_json_loading_failed(self, error):
+    raise JSONBadRequest()
+
+
+Request.on_json_loading_failed = on_json_loading_failed
+
+
 @app.route("/urlinfo/1/<path:text>", methods=['GET'])
 def getUrlInfoV1(text):
-    entireUrl = request.url
-    pathPrefix = "/urlinfo/1/"
-
-    indexOfExpectedUrlToQuery = entireUrl.find(pathPrefix)
-    urlToQuery = entireUrl[indexOfExpectedUrlToQuery + len(pathPrefix):]
-
-    logging.info("Request received for information about url: %s" % urlToQuery)
-
     responseHandler = requestHandlerFactory.createUrlInfoRequestHandlerV1()
-    response = responseHandler.getSerializedResponse(urlToQuery)
+    response = responseHandler.handleRequest(request)
+    return response
 
-    if response == None:
-        return "Internal error when handling url information request, url:" % urlToQuery, 500
 
+@app.route("/blacklist/1", methods=['POST'])
+def postUrlBlacklistV1():
+    responseHandler = requestHandlerFactory.createUrlBlacklistRequestHandlerV1()
+    response = responseHandler.handleRequest(request)
     return response
 
 
