@@ -10,8 +10,6 @@ class TestUrlInfoRequestHandler(unittest.TestCase):
         self.mockUrlInfoStore = Mock()
         self.urlRequestHandlerV1 = UrlInfoRequestHandlerV1(self.mockUrlInfoStore)
 
-        self.expectedJsonStructure = "{}"
-
     def test_getInfoResponseBody_returns_expectedJsonStructure(self):
         self.mockUrlInfoStore.isSafe.return_value = False
         response = self.urlRequestHandlerV1.getSerializedResponse("some/url")
